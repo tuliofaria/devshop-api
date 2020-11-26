@@ -16,6 +16,13 @@ type Product {
   category: String
 }
 
+type Brand {
+  id: String
+  name: String
+  slug: String
+  logo: String
+}
+
 type Query {
   getAllCategories: [Category!]!
   getCategoryById(id: String!): Category!
@@ -23,6 +30,9 @@ type Query {
   getAllProducts: [Product!]!
   getProductById(id: String!): Product!
   getProductBySlug(slug: String!): Product!
+  getAllBrands: [Brand!]!
+  getBrandById(id: String!): Brand!
+  getBrandBySlug(slug: String!): Brand!
 }
 
 type Mutation {
@@ -32,6 +42,11 @@ type Mutation {
   createProduct(input: ProductCreateInput!): Product!
   updateProduct(input: ProductUpdateInput!): Product!
   deleteProduct(id: String!): Boolean!
+  createBrand(input: BrandCreateInput!): Brand!
+  uploadBrandLogo(file: Upload!, id: String!): Boolean!
+  removeBrandLogo(id: String!): Boolean!
+  updateBrand(input: BrandUpdateInput!): Brand!
+  deleteBrand(id: String!): Boolean!
 }
 
 input CategoryCreateInput {
@@ -58,4 +73,18 @@ input ProductUpdateInput {
   slug: String!
   description: String!
   category: String!
+}
+
+input BrandCreateInput {
+  name: String!
+  slug: String!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input BrandUpdateInput {
+  id: String!
+  name: String!
+  slug: String!
 }

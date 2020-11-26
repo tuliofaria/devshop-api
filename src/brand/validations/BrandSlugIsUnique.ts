@@ -1,16 +1,16 @@
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { CategoryService } from "../category.service";
+import { BrandService } from "../brand.service";
 
 @ValidatorConstraint({ name: 'categorySlugIsUnique', async: true })
-export class CategorySlugIsUnique implements ValidatorConstraintInterface {
-  constructor(private readonly categoryService: CategoryService){
+export class BrandSlugIsUnique implements ValidatorConstraintInterface {
+  constructor(private readonly brandService: BrandService){
   }
   async validate(text: string, validationArguments: ValidationArguments): Promise<boolean>{
     const id = validationArguments.object['id']
-    const category = await this.categoryService.findBySlug(text)
-    if(category){
+    const brand = await this.brandService.findBySlug(text)
+    if(brand){
       if(id){ // update
-        if(id === category.id){
+        if(id === brand.id){
           return true
         }
       }
