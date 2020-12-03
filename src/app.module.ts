@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ProductModule } from './product/product.module'
 import { BrandModule } from './brand/brand.module'
+import { UserModule } from './user/user.module'
+import { CoreModule } from './core/core.module'
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { BrandModule } from './brand/brand.module'
         logging: true
       })
     }),
+    CoreModule,
     /*
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -33,11 +36,13 @@ import { BrandModule } from './brand/brand.module'
     }),
     */
     GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql'
+      autoSchemaFile: 'schema.gql',
+      context: ({ req, res }) => ({ req, res })
     }),
     CategoryModule,
     ProductModule,
-    BrandModule
+    BrandModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService]

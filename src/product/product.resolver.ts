@@ -2,10 +2,10 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { ProductPublic } from './dto/product'
 import { ProductCreateInput } from './dto/product-create.input'
 import { ProductService } from './product.service'
-import { Product } from './product.entity'
-import { Category } from 'src/category/category.entity'
 import { ProductMapper } from './product.mapper'
 import { ProductUpdateInput } from './dto/product-update.input'
+import { UseGuards } from '@nestjs/common'
+import { AuthGuard } from 'src/utils/jwt-auth.guard'
 
 @Resolver(of => ProductPublic)
 export class ProductResolver {
@@ -25,10 +25,13 @@ export class ProductResolver {
 
   @Query(returns => ProductPublic, { name: 'getProductBySlug' })
   async getProductBySlug(@Args('slug') slug: string): Promise<ProductPublic> {
-    return ProductMapper.fromEntityToPublic(await this.productService.findBySlug(slug))
+    return ProductMapper.fromEntityToPublic(
+      await this.productService.findBySlug(slug)
+    )
   }
 
-  @Mutation(returns => ProductPublic, { name: 'createProduct' })
+  @UseGuards(AuthGuard)
+  @Mutation(returns => ProductPublic, { name: 'panelCreateProduct' })
   async createProduct(
     @Args('input') input: ProductCreateInput
   ): Promise<ProductPublic> {
@@ -36,7 +39,9 @@ export class ProductResolver {
       await this.productService.create(ProductMapper.toEntity(input))
     )
   }
-  @Mutation(returns => ProductPublic, { name: 'updateProduct' })
+
+  @UseGuards(AuthGuard)
+  @Mutation(returns => ProductPublic, { name: 'panelUpdateProduct' })
   async updateProduct(
     @Args('input') input: ProductUpdateInput
   ): Promise<ProductPublic> {
@@ -44,7 +49,9 @@ export class ProductResolver {
       await this.productService.update(ProductMapper.fromUpdateToEntity(input))
     )
   }
-  @Mutation(returns => Boolean, { name: 'deleteProduct' })
+
+  @UseGuards(AuthGuard)
+  @Mutation(returns => Boolean, { name: 'panelDeleteProduct' })
   async deleteProduct(@Args('id') input: string): Promise<boolean> {
     return this.productService.delete(input)
   }

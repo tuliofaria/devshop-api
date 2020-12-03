@@ -23,6 +23,30 @@ type Brand {
   logo: String
 }
 
+type User {
+  id: String
+  name: String
+  email: String
+  role: String
+}
+
+type AuthToken {
+  refreshToken: String!
+  accessToken: String!
+}
+
+type AuthSession {
+  id: String!
+  userAgent: String
+  lastUsedAt: DateTime
+  active: Boolean
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   getAllCategories: [Category!]!
   getCategoryById(id: String!): Category!
@@ -33,20 +57,32 @@ type Query {
   getAllBrands: [Brand!]!
   getBrandById(id: String!): Brand!
   getBrandBySlug(slug: String!): Brand!
+  panelGetAllUsers: [User!]!
+  panelGetAllUserSessions(id: String!): [AuthSession!]!
+  panelGetUserById(id: String!): User!
+  panelGetUserByEmail(email: String!): User!
+  panelGetMe: User!
 }
 
 type Mutation {
-  createCategory(input: CategoryCreateInput!): Category!
-  updateCategory(input: CategoryUpdateInput!): Category!
-  deleteCategory(id: String!): Boolean!
-  createProduct(input: ProductCreateInput!): Product!
-  updateProduct(input: ProductUpdateInput!): Product!
-  deleteProduct(id: String!): Boolean!
-  createBrand(input: BrandCreateInput!): Brand!
-  uploadBrandLogo(file: Upload!, id: String!): Boolean!
-  removeBrandLogo(id: String!): Boolean!
-  updateBrand(input: BrandUpdateInput!): Brand!
-  deleteBrand(id: String!): Boolean!
+  panelCreateCategory(input: CategoryCreateInput!): Category!
+  panelUpdateCategory(input: CategoryUpdateInput!): Category!
+  panelDeleteCategory(id: String!): Boolean!
+  panelCreateProduct(input: ProductCreateInput!): Product!
+  panelUpdateProduct(input: ProductUpdateInput!): Product!
+  panelDeleteProduct(id: String!): Boolean!
+  panelCreateBrand(input: BrandCreateInput!): Brand!
+  panelUploadBrandLogo(file: Upload!, id: String!): Boolean!
+  panelRemoveBrandLogo(id: String!): Boolean!
+  panelUpdateBrand(input: BrandUpdateInput!): Brand!
+  panelDeleteBrand(id: String!): Boolean!
+  panelCreateUser(input: UserCreateInput!): User!
+  panelUpdateUser(input: UserUpdateInput!): User!
+  panelChangeUserPass(input: UserPassUpdateInput!): Boolean!
+  panelDeleteUser(id: String!): Boolean!
+  auth(input: AuthUserInput!): AuthToken!
+  accessToken(refreshToken: String!): String!
+  panelInvalidateUserSession(id: String!): Boolean!
 }
 
 input CategoryCreateInput {
@@ -87,4 +123,28 @@ input BrandUpdateInput {
   id: String!
   name: String!
   slug: String!
+}
+
+input UserCreateInput {
+  name: String!
+  email: String!
+  passwd: String!
+  role: String!
+}
+
+input UserUpdateInput {
+  id: String!
+  name: String!
+  email: String!
+  role: String!
+}
+
+input UserPassUpdateInput {
+  id: String!
+  passwd: String!
+}
+
+input AuthUserInput {
+  email: String!
+  passwd: String!
 }
