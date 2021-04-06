@@ -2,18 +2,20 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Product } from './product.entity'
-
+import { S3 } from 'src/utils/s3'
+import * as sharp from 'sharp'
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
-    private productRepository: Repository<Product>
+    private productRepository: Repository<Product>,
+    private s3: S3
   ) {}
   async findById(id: string): Promise<Product> {
     return this.productRepository.findOne(id, { loadRelationIds: true })
   }
-  async findBySlug(slug: string): Promise<Product>{
-    return this.productRepository.findOne({ where: [{ slug }]})
+  async findBySlug(slug: string): Promise<Product> {
+    return this.productRepository.findOne({ where: [{ slug }] })
   }
   async findAll(): Promise<Product[]> {
     return this.productRepository.find({ loadRelationIds: true })
@@ -39,5 +41,54 @@ export class ProductService {
     } catch (err) {
       return false
     }
+  }
+
+  async uploadImage(
+    id: string,
+    createReadStream: () => any,
+    filename: string,
+    mimetype: string
+  ): Promise<boolean> {
+    const product = await this.productRepository.findOne(id)
+    if (!product) {
+      return false
+    }
+    if (!product.images) {
+      product.images = []
+    }
+    const stream = createReadStream().pipe(sharp().resize(300))
+    const url = await this.s3.upload(
+      stream,
+      mimetype,
+      'devshop-assets',
+      id + '-' + filename
+    )
+    product.images.push(url)
+    await this.productRepository.update(id, {
+      images: product.images
+    })
+    return true
+  }
+
+  async deleteImage(id: string, url: string): Promise<boolean> {
+    const product = await this.productRepository.findOne(id)
+    if (!product) {
+      return false
+    }
+    if (!product.images) {
+      product.images = []
+    }
+
+    const filenameParts = url.split('/')
+    const filename = filenameParts[filenameParts.length - 1]
+
+    await this.s3.deleteObject('devshop-assets', filename)
+    console.log('delete', url, filename)
+
+    product.images = product.images.filter(imgUrl => imgUrl !== url)
+    await this.productRepository.update(id, {
+      images: product.images
+    })
+    return true
   }
 }

@@ -16,4 +16,7 @@ export class ProductPublic {
 
   @Field({ nullable: true })
   category: string
+
+  @Field(type => [String], { nullable: true })
+  images: string[]
 }

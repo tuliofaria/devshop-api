@@ -15,6 +15,14 @@ export class ProductMapper {
     category.id = input.category
     entity.category = category
 
+    entity.sku = input.sku
+    entity.price = input.price
+    entity.weight = input.weight
+
+    entity.optionNames = input.optionNames
+    entity.variations = input.variations
+    entity.stock = input.stock
+
     return entity
   }
   public static fromUpdateToEntity(input: ProductUpdateInput): Product {
@@ -37,6 +45,7 @@ export class ProductMapper {
     product.slug = entity.slug
     product.description = entity.description
     product.category = entity.category.toString()
+    product.images = entity.images
     return product
   }
 }
