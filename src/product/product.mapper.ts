@@ -46,6 +46,9 @@ export class ProductMapper {
     product.description = entity.description
     product.category = entity.category.toString()
     product.images = entity.images
+    product.price = Number(entity.price.toString().replace('$', ''))
+    product.variations = entity.variations
+    product.optionNames = entity.optionNames
     return product
   }
 }

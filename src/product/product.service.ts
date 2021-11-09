@@ -4,21 +4,48 @@ import { Repository } from 'typeorm'
 import { Product } from './product.entity'
 import { S3 } from 'src/utils/s3'
 import * as sharp from 'sharp'
+import { Category } from 'src/category/category.entity'
+import { Brand } from 'src/brand/brand.entity'
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
+    @InjectRepository(Brand)
+    private brandRepository: Repository<Brand>,
     private s3: S3
   ) {}
   async findById(id: string): Promise<Product> {
     return this.productRepository.findOne(id, { loadRelationIds: true })
   }
   async findBySlug(slug: string): Promise<Product> {
-    return this.productRepository.findOne({ where: [{ slug }] })
+    return this.productRepository.findOne({
+      where: [{ slug }],
+      loadRelationIds: true
+    })
   }
   async findAll(): Promise<Product[]> {
     return this.productRepository.find({ loadRelationIds: true })
+  }
+  async findAllByCategory(categorySlug: string): Promise<Product[]> {
+    const category = await this.categoryRepository.findOne({
+      where: [{ slug: categorySlug }]
+    })
+    return this.productRepository.find({
+      loadRelationIds: true,
+      where: [{ category: category.id }]
+    })
+  }
+  async findAllByBrand(brandSlug: string): Promise<Product[]> {
+    const brand = await this.brandRepository.findOne({
+      where: [{ slug: brandSlug }]
+    })
+    return this.productRepository.find({
+      loadRelationIds: true,
+      where: [{ brand: brand.id }]
+    })
   }
   async create(input: Product): Promise<Product> {
     return this.productRepository.save(input)

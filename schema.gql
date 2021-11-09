@@ -8,13 +8,25 @@ type Category {
   slug: String
 }
 
+type Variation {
+  optionName1: String!
+  optionName2: String!
+  sku: String!
+  price: Float!
+  weight: Float!
+  stock: Int!
+}
+
 type Product {
   id: String
   name: String
   slug: String
   description: String
   category: String
+  price: Float
   images: [String!]
+  optionNames: [String!]
+  variations: [Variation!]
 }
 
 type Brand {
@@ -53,6 +65,8 @@ type Query {
   getCategoryById(id: String!): Category!
   getCategoryBySlug(slug: String!): Category!
   getAllProducts: [Product!]!
+  getAllProductsByCategory(categorySlug: String!): [Product!]!
+  getAllProductsByBrand(brandSlug: String!): [Product!]!
   getProductById(id: String!): Product!
   getProductBySlug(slug: String!): Product!
   getAllBrands: [Brand!]!

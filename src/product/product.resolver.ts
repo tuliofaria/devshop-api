@@ -18,6 +18,22 @@ export class ProductResolver {
     const products = await this.productService.findAll()
     return products.map(ProductMapper.fromEntityToPublic)
   }
+
+  @Query(returns => [ProductPublic], { name: 'getAllProductsByCategory' })
+  async getAllProductsByCategory(
+    @Args('categorySlug') categorySlug: string
+  ): Promise<ProductPublic[]> {
+    const products = await this.productService.findAllByCategory(categorySlug)
+    return products.map(ProductMapper.fromEntityToPublic)
+  }
+  @Query(returns => [ProductPublic], { name: 'getAllProductsByBrand' })
+  async getAllProductsByBrand(
+    @Args('brandSlug') brandSlug: string
+  ): Promise<ProductPublic[]> {
+    const products = await this.productService.findAllByBrand(brandSlug)
+    return products.map(ProductMapper.fromEntityToPublic)
+  }
+
   @Query(returns => ProductPublic, { name: 'getProductById' })
   async getProductById(@Args('id') id: string): Promise<ProductPublic> {
     return ProductMapper.fromEntityToPublic(
