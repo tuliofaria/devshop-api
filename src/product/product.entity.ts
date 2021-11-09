@@ -1,3 +1,4 @@
+import { Brand } from 'src/brand/brand.entity'
 import { Category } from 'src/category/category.entity'
 import {
   Column,
@@ -39,6 +40,12 @@ export class Product {
     category => category.id
   )
   category: Category
+
+  @ManyToOne(
+    type => Brand,
+    brand => brand.id
+  )
+  brand: Brand
 
   @Column({ type: 'jsonb', nullable: true })
   optionNames: string[]
